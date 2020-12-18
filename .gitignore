@@ -1,0 +1,8 @@
+# Ignore all
+*
+
+# Allow only
+!*.c
+!*.h
+!Makefile
+!.gitignore
