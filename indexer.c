@@ -4,7 +4,7 @@
 #include <fts.h>
 #include <sys/stat.h>
 
-file_type_t get_file_type(size_t signature)
+file_type_t get_file_type(uint64_t signature)
 {
     if((signature & 0xffffff) == 0xffd8ff)  // JPEG signature: FF D8 FF (...)
         return Image_JPEG;
