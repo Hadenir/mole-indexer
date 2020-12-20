@@ -75,8 +75,8 @@ bool index_read(mole_index_t* index, char* index_path)
         else ERROR("open");
     }
 
-    size_t index_size;
-    if(read(fd, &index_size, sizeof(size_t)) < 0)  ERROR("read");
+    uint64_t index_size;
+    if(read(fd, &index_size, sizeof(index_size)) < 0)  ERROR("read");
 
     index_extend(index, index_size);
 
@@ -94,8 +94,8 @@ void index_save(mole_index_t* index, char* index_path)
     int fd = open(index_path, O_CREAT | O_WRONLY, DEFAULT_MASK);
     if(fd < 0) ERROR("open");
 
-    size_t index_size = index->size;
-    if(write(fd, &index_size, sizeof(size_t)) < 0) ERROR("write");
+    uint64_t index_size = index->size;
+    if(write(fd, &index_size, sizeof(index_size)) < 0) ERROR("write");
 
     if(write(fd, index->elements, index_size * sizeof(mole_index_entry_t)) < 0) ERROR("write");
 

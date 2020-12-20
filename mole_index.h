@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdint.h>
+
 #include "common.h"
 
 #define MOLE_DIR_VAR "MOLE_DIR"
@@ -24,7 +26,7 @@ typedef struct mole_index_entry
 {
     char file_name[STR_MAX];
     char full_path[PATH_MAX];
-    size_t size;
+    uint64_t size;
     uid_t owner_uid;
     file_type_t file_type;
 } mole_index_entry_t;
