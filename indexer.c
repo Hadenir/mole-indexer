@@ -20,6 +20,11 @@ file_type_t get_file_type(size_t signature)
 
 void indexer_start_worker(mole_context_t* context)
 {
+    if(context->indexing_pending)
+        return;
+
+    context->indexing_pending = true;
+
     pthread_attr_t attributes;
     if(pthread_attr_init(&attributes)) ERROR("pthread_attr_init");
     if(pthread_attr_setdetachstate(&attributes, PTHREAD_CREATE_DETACHED)) ERROR("pthread_attr_setdetachstate");
@@ -32,11 +37,6 @@ void indexer_start_worker(mole_context_t* context)
 void* indexer_worker(void* args)
 {
     mole_context_t* context = (mole_context_t*) args;
-
-    if(context->indexing_pending)
-        return NULL;
-
-    context->indexing_pending = true;
 
     mole_index_t new_index;
     index_init(&new_index);
