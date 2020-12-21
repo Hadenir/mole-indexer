@@ -1,6 +1,7 @@
 #pragma once
 
 #include <pthread.h>
+#include <signal.h>
 
 #include "common.h"
 #include "mole_index.h"
@@ -16,3 +17,6 @@ void indexer_start_worker(mole_context_t* context);
 // This function is supposed to be executed inside
 // seperate thread. See `indexer_start_worker()`.
 void* indexer_worker(void* args);
+
+// Signal handler.
+void indexer_sig_handler(int signo);

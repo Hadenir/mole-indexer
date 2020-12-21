@@ -20,10 +20,15 @@ file_type_t get_file_type(uint64_t signature)
 
 void indexer_start_worker(mole_context_t* context)
 {
+    pthread_mutex_lock(context->indexing_mutex);
     if(context->indexing_pending)
+    {
+        pthread_mutex_unlock(context->indexing_mutex);
         return;
+    }
 
     context->indexing_pending = true;
+    pthread_mutex_unlock(context->indexing_mutex);
 
     pthread_attr_t attributes;
     if(pthread_attr_init(&attributes)) ERROR("pthread_attr_init");
@@ -87,12 +92,17 @@ void* indexer_worker(void* args)
         }
         errno = 0;
 
+        pthread_mutex_lock(context->force_exit_mutex);
         if(context->force_exit)
         {
             if(fts_close(fts)) ERROR("fts_close");
+            pthread_mutex_lock(context->indexing_mutex);
             context->indexing_pending = false;
+            pthread_mutex_unlock(context->indexing_mutex);
+            pthread_cond_broadcast(context->indexing_done);
             return NULL;
         }
+        pthread_mutex_unlock(context->force_exit_mutex);
     }
 
     if(errno != 0) ERROR("fts_read");
@@ -111,7 +121,11 @@ void* indexer_worker(void* args)
     printf("\b\bBackground indexing finished!\n> ");
     fflush(stdout);
 
+    pthread_mutex_lock(context->indexing_mutex);
     context->indexing_pending = false;
+    pthread_mutex_unlock(context->indexing_mutex);
+
+    pthread_cond_broadcast(context->indexing_done);
 
     return NULL;
 }

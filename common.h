@@ -25,8 +25,11 @@ typedef struct mole_context
     mole_index_t* index;
     pthread_mutex_t* index_mutex;
     bool indexing_pending;
+    pthread_cond_t* indexing_done;
+    pthread_mutex_t* indexing_mutex;
     pthread_t worker_tid;
     bool force_exit;
+    pthread_mutex_t* force_exit_mutex;
 } mole_context_t;
 
 // Prints usage message to stderr and terminates the program.

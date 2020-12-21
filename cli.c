@@ -8,8 +8,7 @@ void cli_start(mole_context_t* context)
     char command[COMMAND_MAX];
     char argument[STR_MAX];
 
-    bool exit = false;
-    do
+    for(;;)
     {
         cli_prompt(command, argument);
 
@@ -20,46 +19,48 @@ void cli_start(mole_context_t* context)
         {
             case HELP:
                 cli_help();
-            break;
+                break;
             case EXIT_FORCE:
+                pthread_mutex_lock(context->force_exit_mutex);
                 context->force_exit = true;
+                pthread_mutex_unlock(context->force_exit_mutex);
             case EXIT:
                 printf("Exiting...\n");
-                exit = true;
+                pthread_mutex_lock(context->indexing_mutex);
                 while(context->indexing_pending)
-                    sleep(1);
+                    pthread_cond_wait(context->indexing_done, context->indexing_mutex);
+                pthread_mutex_unlock(context->indexing_mutex);
                 printf("Goodbye!\n");
-            break;
+                return;
             case INDEX:
                 cli_index(context);
-            break;
+                break;
             case COUNT:
                 cli_count(context);
-            break;
+                break;
             case LARGER_THAN:
                 if(!arg_present)
                     cli_missing_param(command);
                 else
                     cli_largerthan(context, atoll(argument));
-            break;
+                break;
             case NAME_PART:
                 if(!arg_present)
                     cli_missing_param(command);
                 else
                     cli_namepart(context, argument);
-            break;
+                break;
             case OWNER:
                 if(!arg_present)
                     cli_missing_param(command);
                 else
                     cli_owner(context, atoi(argument));
-            break;
+                break;
             default:
                 cli_unrecognized_cmd(command);
                 continue;
         }
     }
-    while(!exit);
 }
 
 void cli_prompt(char* command, char* arg)
@@ -104,11 +105,14 @@ void cli_help()
 
 void cli_index(mole_context_t* context)
 {
+    pthread_mutex_lock(context->indexing_mutex);
     if(context->indexing_pending)
     {
         printf("Indexing is already pending!\n");
+        pthread_mutex_unlock(context->indexing_mutex);
         return;
     }
+    pthread_mutex_unlock(context->indexing_mutex);
 
     printf("Starting indexing process...\n");
     indexer_start_worker(context);

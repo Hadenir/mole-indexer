@@ -8,7 +8,6 @@
 */
 
 // TODO:
-// - maximum path and file_name lengths
 // - periodic indexing
 
 #include "common.h"
@@ -85,6 +84,9 @@ int main(int argc, char** argv)
     parseargs(argc, argv, &path_d, &path_f, &time);
 
     pthread_mutex_t index_mutex = PTHREAD_MUTEX_INITIALIZER;
+    pthread_cond_t indexing_done = PTHREAD_COND_INITIALIZER;
+    pthread_mutex_t indexing_mutex = PTHREAD_MUTEX_INITIALIZER;
+    pthread_mutex_t force_exit_mutex = PTHREAD_MUTEX_INITIALIZER;
 
     mole_index_t index;
     index_init(&index);
@@ -96,7 +98,10 @@ int main(int argc, char** argv)
     context.index = &index;
     context.index_mutex = &index_mutex;
     context.indexing_pending = false;
+    context.indexing_done = &indexing_done;
+    context.indexing_mutex = &indexing_mutex;
     context.force_exit = false;
+    context.force_exit_mutex = &force_exit_mutex;
 
     if(!index_read(&index, path_f))
     {
