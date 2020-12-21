@@ -18,5 +18,6 @@ void indexer_start_worker(mole_context_t* context);
 // seperate thread. See `indexer_start_worker()`.
 void* indexer_worker(void* args);
 
-// Signal handler.
-void indexer_sig_handler(int signo);
+// This function is supposed to be executed inside seperate
+// thread. It periodically calls `indexer_start_worker()`.
+void* periodic_indexer_worker(void* args);

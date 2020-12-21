@@ -7,9 +7,6 @@
  * ---------------------------------------------------------------------------------
 */
 
-// TODO:
-// - periodic indexing
-
 #include "common.h"
 #include "mole_index.h"
 #include "indexer.h"
@@ -108,7 +105,13 @@ int main(int argc, char** argv)
         indexer_start_worker(&context);
     }
 
+    pthread_t pi_tid;
+    if(pthread_create(&pi_tid, NULL, periodic_indexer_worker, &context)) ERROR("pthread_create");
+
     cli_start(&context);
+
+    pthread_cancel(pi_tid);
+    pthread_join(pi_tid, NULL);
 
     index_free(&index);
 

@@ -129,3 +129,18 @@ void* indexer_worker(void* args)
 
     return NULL;
 }
+
+
+void* periodic_indexer_worker(void* args)
+{
+    mole_context_t* context = (mole_context_t*) args;
+
+    for(;;)
+    {
+        unsigned int tts = context->time;
+        while(tts > 0)
+            tts = sleep(tts);
+
+        indexer_start_worker(context);
+    }
+}
