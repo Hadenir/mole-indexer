@@ -34,7 +34,8 @@ void indexer_start_worker(mole_context_t* context)
     if(pthread_attr_init(&attributes)) ERROR("pthread_attr_init");
     if(pthread_attr_setdetachstate(&attributes, PTHREAD_CREATE_DETACHED)) ERROR("pthread_attr_setdetachstate");
 
-    if(pthread_create(&context->worker_tid, &attributes, indexer_worker, context)) ERROR("pthread_create");
+    pthread_t worker_tid;
+    if(pthread_create(&worker_tid, &attributes, indexer_worker, context)) ERROR("pthread_create");
 
     if(pthread_attr_destroy(&attributes)) ERROR("pthread_attr_destroy");
 }

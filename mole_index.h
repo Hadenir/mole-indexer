@@ -13,7 +13,7 @@
 // Program scans for there types of files.
 typedef enum file_type
 {
-    Unrecognized,  // Other file types
+    Unrecognized,       // Other file types
     Directory,          // Ordinary directory
     Image_JPEG,         // JPEG image
     Image_PNG,          // PNG image
@@ -24,11 +24,11 @@ typedef enum file_type
 // Represents single entry inside program's index.
 typedef struct mole_index_entry
 {
-    char file_name[STR_MAX];
-    char full_path[PATH_MAX];
-    uint64_t size;
-    uid_t owner_uid;
-    file_type_t file_type;
+    char file_name[STR_MAX];    // File name (name and extension)
+    char full_path[PATH_MAX];   // Full file path (path, name and extension)
+    uint64_t size;              // Size of file (in bytes)
+    uid_t owner_uid;            // File owner's id
+    file_type_t file_type;      // Type of file
 } mole_index_entry_t;
 
 // Index is stored as a single dynamic array. The array is usually bigger than it needs.
