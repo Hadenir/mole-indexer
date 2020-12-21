@@ -106,12 +106,18 @@ int main(int argc, char** argv)
     }
 
     pthread_t pi_tid;
-    if(pthread_create(&pi_tid, NULL, periodic_indexer_worker, &context)) ERROR("pthread_create");
+    if(time > 0)
+    {
+        if(pthread_create(&pi_tid, NULL, periodic_indexer_worker, &context)) ERROR("pthread_create");
+    }
 
     cli_start(&context);
 
-    pthread_cancel(pi_tid);
-    pthread_join(pi_tid, NULL);
+    if(time > 0)
+    {
+        pthread_cancel(pi_tid);
+        pthread_join(pi_tid, NULL);
+    }
 
     index_free(&index);
 
